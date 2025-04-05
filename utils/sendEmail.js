@@ -17,7 +17,7 @@ const sendEmail = async (options) => {
     subject: options.subject,
     text: options.message,
   };
-  console.log("✉️ البريد أُرسل بنجاح:", mailOpts.messageId);
+  console.log("Mail sent successfully:", mailOpts.messageId);
 
   await transporter.sendMail(mailOpts);
 };

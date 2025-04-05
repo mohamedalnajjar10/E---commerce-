@@ -2,9 +2,9 @@ const { Op } = require("sequelize");
 
 class ApiFeatures {
   constructor(model, queryString) {
-    this.model = model; // Sequelize model
-    this.queryString = queryString; // Request query parameters
-    this.queryOptions = {}; // Options object for Sequelize
+    this.model = model; 
+    this.queryString = queryString; 
+    this.queryOptions = {};
   }
 
   // 1. Filtering
@@ -28,16 +28,13 @@ class ApiFeatures {
     if (this.queryString.sort) {
       const sortBy = this.queryString.sort.split(",").map((field) => {
         if (field.startsWith("-")) {
-          // إذا كان الحقل يحتوي على علامة "-", يتم الترتيب تنازليًا
           return [field.substring(1), "DESC"];
         } else {
-          // إذا لم يحتوي على علامة "-", يتم الترتيب تصاعديًا
           return [field, "ASC"];
         }
       });
       this.queryOptions.order = sortBy;
     } else {
-      // الترتيب الافتراضي
       this.queryOptions.order = [["createdAt", "DESC"]];
     }
     return this;
@@ -75,7 +72,6 @@ class ApiFeatures {
         };
       }
 
-      // دمج شروط البحث مع الشروط الموجودة مسبقًا
       this.queryOptions.where = {
         ...this.queryOptions.where,
         ...searchCondition,
