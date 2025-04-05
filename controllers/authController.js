@@ -18,7 +18,6 @@ exports.signup = asyncHandler(async (req, res, next) => {
     password: hashedPassword,
   });
 
-  // 2- Generate token
   const token = createToken(User.id);
 
   res.status(201).json({ data: sanitizeUser(User), token });
@@ -95,7 +94,7 @@ exports.allowedTo = (...roles) =>
   });
 
 exports.forgetPassword = asyncHandler(async (req, res, next) => {
-  // 1) Get user by email
+
   const User = await user.findOne({ where: { email: req.body.email } });
   if (!User) {
     return next(
@@ -139,7 +138,6 @@ exports.forgetPassword = asyncHandler(async (req, res, next) => {
 });
 
 exports.verifyPassResetCode = asyncHandler(async (req, res, next) => {
-  // 1) Get user based on reset code
   const hashedResetCode = crypto
     .createHash("sha256")
     .update(req.body.resetCode)
@@ -156,7 +154,7 @@ exports.verifyPassResetCode = asyncHandler(async (req, res, next) => {
   if (!User) {
     return next(new ApiError("Reset code invalid or expired"));
   }
-  // 2) Reset code valid
+
   User.passwordResetVerified = true;
   await User.save();
 
@@ -166,14 +164,14 @@ exports.verifyPassResetCode = asyncHandler(async (req, res, next) => {
 });
 
 exports.resetPassword = asyncHandler(async (req, res, next) => {
-  // 1) Get user based on email
+
   const User = await user.findOne({ where: { email: req.body.email } });
   if (!User) {
     return next(
       new ApiError(`There is no user with email ${req.body.email}`, 404)
     );
   }
-  // 2) Check if reset code verified
+
   if (!User.passwordResetVerified) {
     return next(new ApiError("Reset code not verified", 400));
   }

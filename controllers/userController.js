@@ -51,7 +51,6 @@ exports.updateLoggedPassword = async (req, res, next) => {
     updateData.password = hashedPassword;
   }
 
-  // تحديث حقل passwordChangedAt
   updateData.passwordChangedAt = new Date();
 
   const Document = await user.update(updateData, {

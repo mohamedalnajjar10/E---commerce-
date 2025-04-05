@@ -67,7 +67,6 @@ exports.changeUserPassword = (Model) => {
       updateData.password = hashedPassword;
     }
 
-    // تحديث حقل passwordChangedAt  
     updateData.passwordChangedAt = new Date();
 
     const Document = await Model.update(updateData, {
@@ -86,15 +85,12 @@ exports.changeUserPassword = (Model) => {
 exports.updateOne = (Model) => {
   return asyncHandler(async (req, res, next) => {
     const { id } = req.params;
-    // 1. تحديث البيانات أولًا
     const Document = await Model.update(req.body, {
       where: { id: id },
     });
-    // 2. إذا ال categoryId غير موجود
     if (!Document) {
       return next(new ApiError(`No Document For This Id ${id}`, 404));
     }
-    // 3. جلب البيانات المحدثة من قاعدة البيانات
     const document = await Model.findByPk(id, {});
     res.status(200).send({ data: document });
   });
@@ -102,10 +98,8 @@ exports.updateOne = (Model) => {
 
 exports.createOne = (Model) => {
   return asyncHandler(async (req, res) => {
-    // 1. إنشاء نسخة من البيانات المرسلة لتجنب التعديل المباشر على req.body
     const documentData = { ...req.body };
 
-    // 2. تشفير كلمة المرور إذا كانت موجودة في البيانات
     if (documentData.password) {
       const hashedPassword = await bcrypt.hashSync(documentData.password, 10);
       documentData.password = hashedPassword;
@@ -133,10 +127,8 @@ exports.getAll = (Model) => {
       if (req.params.Model) filterObject = { documents: req.params.Model };
       req.filterObj = filterObject || {};
       
-      // حساب عدد المستندات
       const totalDocuments = await Model.count();
 
-      // إنشاء كائن ApiFeatures
       const features = new ApiFeatures(Model, req.query);
       features
         .filter()
@@ -145,10 +137,8 @@ exports.getAll = (Model) => {
         .search(Model.name)
         .paginate(totalDocuments);
 
-      // تنفيذ الاستعلام
       const documents = await features.execute();
 
-      // إرسال الاستجابة
       res.status(200).json({
         status: "success",
         results: documents.length,

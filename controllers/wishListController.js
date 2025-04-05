@@ -7,25 +7,20 @@ const product = require("../models/product.js");
 exports.addProductToWishlist = asyncHandler(async (req, res, next) => {
   const { productId } = req.body;
 
-  // تأكيد أن الـ productId موجود
   if (!productId) {
     return next(new ApiError("Product ID is required", 400));
   }
 
-  // الحصول على userId من الـ JWT Token أو من الـ session (حسب الطريقة التي تستخدمها للمصادقة)
   const userId = req.User.id;
 
-  // البحث عن المستخدم
   const User = await user.findByPk(userId);
   if (!User) {
     return next(new ApiError("User not found", 404));
   }
 
-  // التحقق من وجود المنتج في القائمة
   if (User.wishList && User.wishList.includes(productId)) {
     return next(new ApiError("Product already in wishlist", 400));
   }
-  // إضافة المنتج إلى قاعدة البيانات
   await wishList.create({ userId, productId });
 
   res.status(200).json({
@@ -38,21 +33,17 @@ exports.addProductToWishlist = asyncHandler(async (req, res, next) => {
 exports.removeProductFromWishlist = asyncHandler(async (req, res, next) => {
   const { productId } = req.body;
 
-  // تأكيد أن الـ productId موجود
   if (!productId) {
     return next(new ApiError("Product ID is required", 400));
   }
 
-  // الحصول على userId من الـ JWT Token أو من الـ session (حسب الطريقة التي تستخدمها للمصادقة)
   const userId = req.User.id;
 
-  // البحث عن المستخدم
   const User = await user.findByPk(userId);
   if (!User) {
     return next(new ApiError("User not found", 404));
   }
 
-  // البحث عن المنتج في wishList الخاص بالمستخدم
   const wishListItem = await wishList.findOne({
     where: {
       userId,
@@ -60,12 +51,10 @@ exports.removeProductFromWishlist = asyncHandler(async (req, res, next) => {
     },
   });
 
-  // التأكد من أن المنتج موجود في الـ wishList
   if (!wishListItem) {
     return next(new ApiError("Product not found in your wishlist", 404));
   }
 
-  // حذف المنتج من الـ wishList
   await wishListItem.destroy();
 
   res.status(200).json({
@@ -76,15 +65,12 @@ exports.removeProductFromWishlist = asyncHandler(async (req, res, next) => {
 });
 
 exports.getLoggedUserWishlist = asyncHandler(async (req, res, next) => {
-  // الحصول على userId من JWT
   const userId = req.User?.id;
 
-  // التحقق من وجود userId
   if (!userId) {
     return next(new ApiError("Invalid token or user ID not found", 401));
   }
 
-  // البحث عن المستخدم مع قائمة الأمنيات الخاصة به
   const User = await user.findByPk(userId, {
     include: [
       {
@@ -92,22 +78,19 @@ exports.getLoggedUserWishlist = asyncHandler(async (req, res, next) => {
         include: [
           {
             model: product,
-            attributes: ["title", "price"], // تحديد الأعمدة المطلوبة فقط
+            attributes: ["title", "price"], 
           },
         ],
       },
     ],
   });
 
-  // التحقق من وجود المستخدم
   if (!User) {
     return next(new ApiError("User not found", 404));
   }
 
-  // جلب بيانات الـ wishList للمستخدم
-  const userWishlist = User.wishLists || []; // إذا لم توجد عناصر، أرجع مصفوفة فارغة
+  const userWishlist = User.wishLists || []; 
 
-  // إرسال الرد
   res.status(200).json({
     status: "success",
     results: userWishlist.length,
