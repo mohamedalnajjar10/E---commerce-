@@ -32,10 +32,13 @@
 
 ### 1. Clone the repo
 
+```bash
+
 git clone https://github.com/mohamedalnajjar10/E---commerce-.git
 cd E---commerce-
 
 2. Install Dependencies
+```bash
 
 npm install
 
@@ -43,5 +46,6 @@ npm install
 create .env file in the root folder, fill it according to .env.example file.
 
 4. Running
+```bash
 
 npm start
